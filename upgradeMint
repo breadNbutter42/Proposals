@@ -1,0 +1,61 @@
+
+    /// @notice The upgrade contract
+    /// @dev This address is allowed to call `upgradeMint`
+    address public override upgradeContract;
+
+    /// @notice Tracks the amount of NFTs minted by `upgradeContract`
+    uint public override amountMintedByDNA;
+
+    /// @notice Amount of NFTs reserved for `upgradeContract` (e.g 200)
+    /// @dev It can be minted any time via `upgradeMint`
+    uint public override amountForDNA = 3250;
+
+    /// @dev Emitted on setUpgradeContract()
+    /// @param upgradeContract The new upgrade contract
+    event UpgradeContractUpdated(address indexed upgradeContract);
+
+    modifier onlyUpgradeContract() {
+        if (upgradeContract != msg.sender) {
+            revert Upgrade__Unauthorized();
+        }
+        _;
+    }
+
+
+    /// @notice Set the upgrade contract address
+    /// @dev The upgrade contract can call `upgradeMint` any time
+    /// @param _upgradeContract The upgrade contract
+    function setUpgradeContract(address _upgradeContract)
+        external
+        override
+        onlyOwner
+    {
+        if (_upgradeContract == address(0)) {
+            revert Launchpeg__InvalidUpgradeContract();
+        }
+
+        upgradeContract = _upgradeContract;
+        emit UpgradeContractUpdated(upgradeContract);
+    }
+
+
+    /// @notice Mint NFTs for the upgradeContract
+    /// @dev Can only mint up to `amountForDNA`
+    /// @param _quantity Quantity of NFTs to mint
+    function upgradeMint(uint256 _quantity) external override onlyUpgradeContract {
+        if (totalSupply() + _quantity > collectionSize) {
+            revert Launchpeg__MaxSupplyReached();
+        }
+        if (amountMintedByDNA + _quantity > amountForDNA) {
+            revert Launchpeg__MaxSupplyForDNAReached();
+        }
+        if (_quantity % maxBatchSize != 0) {
+            revert Launchpeg__CanOnlyMintMultipleOfMaxBatchSize();
+        }
+        amountMintedByDNA = amountMintedByDNA + _quantity;
+        uint256 numChunks = _quantity / maxBatchSize;
+        for (uint256 i; i < numChunks; i++) {
+            _mint(msg.sender, maxBatchSize, "", false);
+        }
+        emit upgradeMint(msg.sender, _quantity);
+    }
