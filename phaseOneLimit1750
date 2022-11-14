@@ -1,0 +1,6 @@
+    modifier under1750() {//limit initial mint phase to 1750 tokens total
+        if (totalSupply() + _quantity > 1749) {//counts to 1749 since started counting at 0
+            revert Launchpeg__MaxPhaseOneSupplyReached();
+        }
+        _;
+    }
