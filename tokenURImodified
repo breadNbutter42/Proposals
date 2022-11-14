@@ -15,7 +15,7 @@ interface IUpgradeURI {
     {
         if (totalSupply() > 1749) {//counts to 1749 since started counting at 0
           return IUpgradeURI(upgradeContract).tokenURI(_id);//ask upgrade contract for token uri for id number given
-        } else (_id >= lastTokenRevealed) {
+        } else if (_id >= lastTokenRevealed) {
             return unrevealedURI;
         } else {
             return
