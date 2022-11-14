@@ -1,0 +1,13 @@
+
+interface IOwnerOld {
+    function ownerOf(uint256) external view returns(address); //read the ownerOf function from the old Chad Doge contract and return the owner address for a given token id #
+}
+
+
+
+    function takeSnapshot(address _oldNftContract, uint256 _starting, uint256 _ending) public onlyOwner {//snapshot of Chad Doge holders
+        for(uint i=_starting; i<=_ending; i++){  //we loop the ID numbers specified including the start and end numbers
+            address _wlHolder = IOwnerOld(_oldNftContract).ownerOf(i); //code to read old contract holder address by ID number for counting wl
+            wlHolder[_wlHolder]+=1; //we add to the mapping of holders
+        }
+    }
