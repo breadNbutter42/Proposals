@@ -1,1 +1,54 @@
+interface IUpgradeURI {
+    function tokenURI(uint256 tokenId) external view returns (string memory) ;//read the tokenURI using our external Upgrade contract
+}
 
+
+//for our switch to phase two, modify tokenURI
+/// @notice Returns the Uniform Resource Identifier (URI) for `tokenId` token.
+    /// @param _id Token id
+    /// @return URI Token URI
+    function tokenURI(uint256 _id)
+        public
+        view
+        override(ERC721AUpgradeable, IERC721MetadataUpgradeable)
+        returns (string memory)
+    {
+        if (totalSupply() > 1749) {//counts to 1749 since started counting at 0
+          return IUpgradeURI(upgradeContract).tokenURI(_id);//ask upgrade contract for token uri for id number given
+        } else (_id >= lastTokenRevealed) {
+            return unrevealedURI;
+        } else {
+            return
+                string(
+                    abi.encodePacked(
+                        baseURI,
+                        _getShuffledTokenId(_id).toString()
+                    )
+                );
+        }
+    }
+
+
+
+//copy original tokenURI for later reference during phase two
+    /// @notice Returns the original Uniform Resource Identifier (URI) for `tokenId` token.
+    /// @param _id original Token id
+    /// @return Original URI Token URI
+    function originalTokenURI(uint256 _id)
+        public
+        view
+        override(ERC721AUpgradeable, IERC721MetadataUpgradeable)
+        returns (string memory)
+    {
+        if (_id >= lastTokenRevealed) {
+            return unrevealedURI;
+        } else {
+            return
+                string(
+                    abi.encodePacked(
+                        baseURI,
+                        _getShuffledTokenId(_id).toString()
+                    )
+                );
+        }
+    }
