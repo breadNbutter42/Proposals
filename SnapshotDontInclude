@@ -13,3 +13,6 @@ interface IOwnerOld {
             wlHolder[_wlHolder]+=1; //we add to the mapping of holders
         }
     }
+seedAllowlist(
+        address[] calldata _addresses,
+        uint256[] calldata _numNfts
